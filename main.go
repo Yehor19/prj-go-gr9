@@ -1,14 +1,20 @@
 package main
 
-import "fmt"
-
-var c, python, java bool
+import (
+	"fmt"
+	"time"
+)
 
 func main() {
-	var i int
-	fmt.Println(i, c, python, java)
-}
+	fmt.Println("Введіть відстань в м:")
+	var distance uint64
+	fmt.Scan(&distance)
 
-func showI() {
-	fmt.Println(c)
+	fmt.Println("Введіть час в хв:")
+	var t float64
+	fmt.Scan(&t)
+
+	velocity := float64(distance) / 1000 / (t / 60)
+	fmt.Printf("Швидкість руху об'єкту %v км/год", velocity)
+	time.Sleep(10 * time.Second)
 }
