@@ -16,7 +16,33 @@ func main() {
 	fmt.Println("Вітаю в моїй грі!")
 	time.Sleep(1 * time.Second)
 
-	for i := 5; i > 0; i-- {
+	for {
+		menu()
+
+		point := ""
+		fmt.Scan(&point)
+
+		switch point {
+		case "1":
+			play()
+		case "2":
+			fmt.Println("Рейтинг в розробці Т_Т")
+		case "3":
+			return
+		default:
+			fmt.Println("Зробіть коректний вибір")
+		}
+	}
+}
+
+func menu() {
+	fmt.Println("1. Почати гру")
+	fmt.Println("2. Переглянути рейтинг")
+	fmt.Println("3. Вийти")
+}
+
+func play() {
+	for i := 3; i > 0; i-- {
 		fmt.Println(i)
 		time.Sleep(1 * time.Second)
 	}
@@ -50,6 +76,5 @@ func main() {
 	end := time.Now()
 	timeSpent := end.Sub(start)
 
-	fmt.Printf("Вітаю! Ти пройшов гру за %v!", timeSpent)
-	time.Sleep(5 * time.Second)
+	fmt.Printf("Вітаю! Ти пройшов гру за %v!\n", timeSpent)
 }
