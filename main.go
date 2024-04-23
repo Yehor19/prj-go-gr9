@@ -1,8 +1,10 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"math/rand"
+	"os"
 	"prj-go/domain"
 	"sort"
 	"strconv"
@@ -21,6 +23,12 @@ func main() {
 	time.Sleep(1 * time.Second)
 
 	var users []domain.User
+	users = getUsers()
+	for _, user := range users {
+		if user.Id >= id {
+			id = user.Id + 1
+		}
+	}
 
 	for {
 		menu()
@@ -31,8 +39,11 @@ func main() {
 		switch point {
 		case "1":
 			u := play()
+			users = getUsers()
 			users = append(users, u)
+			sortAndSave(users)
 		case "2":
+			users = getUsers()
 			for i, user := range users {
 				fmt.Printf(
 					"i: %v, id: %v, name: %s, time: %v\n",
@@ -114,4 +125,69 @@ func sortAndSave(users []domain.User) {
 		return users[i].Time < users[j].Time
 	})
 
+	file, err := os.OpenFile(
+		"users.json",
+		os.O_RDWR|os.O_CREATE|os.O_TRUNC,
+		0755,
+	)
+	if err != nil {
+		fmt.Printf("Error: %s\n", err)
+		return
+	}
+
+	defer func(f *os.File) {
+		err = f.Close()
+		if err != nil {
+			fmt.Printf("Error: %s\n", err)
+		}
+	}(file)
+
+	encoder := json.NewEncoder(file)
+	err = encoder.Encode(users)
+	if err != nil {
+		fmt.Printf("Error: %s\n", err)
+		return
+	}
+}
+
+func getUsers() []domain.User {
+	var users []domain.User
+
+	info, err := os.Stat("users.json")
+	if err != nil {
+		if os.IsNotExist(err) {
+			_, err = os.Create("users.json")
+			if err != nil {
+				fmt.Printf("Error: %s\n", err)
+				return nil
+			}
+			return nil
+		}
+		fmt.Printf("Error: %s\n", err)
+		return nil
+	}
+
+	if info.Size() != 0 {
+		file, err := os.Open("users.json")
+		if err != nil {
+			fmt.Printf("Error: %s\n", err)
+			return nil
+		}
+
+		defer func(f *os.File) {
+			err = f.Close()
+			if err != nil {
+				fmt.Printf("Error: %s\n", err)
+			}
+		}(file)
+
+		decoder := json.NewDecoder(file)
+		err = decoder.Decode(&users)
+		if err != nil {
+			fmt.Printf("Error: %s\n", err)
+			return nil
+		}
+	}
+
+	return users
 }
