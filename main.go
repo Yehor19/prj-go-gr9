@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"math/rand"
+	"prj-go/domain"
+	"sort"
 	"strconv"
 	"time"
 )
@@ -12,9 +14,13 @@ const (
 	pointsPerQuestion = 5
 )
 
+var id uint64 = 1
+
 func main() {
 	fmt.Println("Вітаю в моїй грі!")
 	time.Sleep(1 * time.Second)
+
+	var users []domain.User
 
 	for {
 		menu()
@@ -24,9 +30,15 @@ func main() {
 
 		switch point {
 		case "1":
-			play()
+			u := play()
+			users = append(users, u)
 		case "2":
-			fmt.Println("Рейтинг в розробці Т_Т")
+			for i, user := range users {
+				fmt.Printf(
+					"i: %v, id: %v, name: %s, time: %v\n",
+					i, user.Id, user.Name, user.Time,
+				)
+			}
 		case "3":
 			return
 		default:
@@ -41,7 +53,7 @@ func menu() {
 	fmt.Println("3. Вийти")
 }
 
-func play() {
+func play() domain.User {
 	for i := 3; i > 0; i-- {
 		fmt.Println(i)
 		time.Sleep(1 * time.Second)
@@ -77,4 +89,29 @@ func play() {
 	timeSpent := end.Sub(start)
 
 	fmt.Printf("Вітаю! Ти пройшов гру за %v!\n", timeSpent)
+	fmt.Println("Введіть своє ім'я")
+
+	name := ""
+	fmt.Scan(&name)
+
+	// var user domain.User
+	// user.Id = id
+	// user.Name = name
+	// user.Time = timeSpent
+
+	user := domain.User{
+		Id:   id,
+		Name: name,
+		Time: timeSpent,
+	}
+	id++
+
+	return user
+}
+
+func sortAndSave(users []domain.User) {
+	sort.SliceStable(users, func(i, j int) bool {
+		return users[i].Time < users[j].Time
+	})
+
 }
